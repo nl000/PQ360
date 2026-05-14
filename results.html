@@ -67,7 +67,7 @@
     /* ── Workspace ───────────────────────────────────── */
     .workspace {
       flex: 1; display: flex; overflow: hidden;
-      gap: 12px; background: #f1f5f9; padding: 16px 80px;
+      gap: 2px; background: #f1f5f9; padding: 16px 80px;
     }
     .main-col {
       flex: 1; display: flex; flex-direction: column;
@@ -76,16 +76,42 @@
 
     /* ── Resize handle ───────────────────────────────── */
     .resize-handle {
-      width: 14px; flex-shrink: 0;
+      width: 16px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      cursor: col-resize;
+      cursor: col-resize; position: relative; border-radius: 6px;
+      transition: background 0.15s;
     }
-    .resize-handle::before {
-      content: ''; width: 3px; height: 32px; border-radius: 99px;
-      background: #cbd5e1; transition: background 0.15s, height 0.15s;
+    .resize-handle:hover,
+    .resize-handle.dragging { background: rgba(79,70,229,0.07); }
+    .resize-handle::before { display: none; }
+
+    /* Always-visible grip dots (2 columns × 4 rows) */
+    .resize-grip {
+      display: flex; gap: 4px; pointer-events: none;
     }
-    .resize-handle:hover::before,
-    .resize-handle.dragging::before { background: #4f46e5; height: 48px; }
+    .resize-grip-col {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .resize-grip-col span {
+      display: block; width: 2px; height: 3px; border-radius: 50%;
+      background: #c4cdd8; transition: background 0.15s;
+    }
+    .resize-handle:hover .resize-grip-col span,
+    .resize-handle.dragging .resize-grip-col span { background: #4f46e5; }
+
+    /* Left-arrow hint that appears on hover */
+    .resize-arrow {
+      position: absolute; left: -20px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #4f46e5; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      transform: translateX(6px);
+      box-shadow: 0 2px 6px rgba(79,70,229,0.4);
+    }
+    .resize-handle:hover .resize-arrow { opacity: 1; transform: translateX(0); }
 
     /* ── Info panel ──────────────────────────────────── */
     .info-panel {
@@ -852,7 +878,19 @@
   <!-- ── Resize handle ─────────────────────────────── -->
   <div class="resize-handle" id="resizeHandle"
     role="separator" aria-orientation="vertical"
-    aria-label="Drag to resize assistant panel" title="Drag to resize"></div>
+    aria-label="Drag left to expand assistant panel" title="Drag left to expand">
+    <div class="resize-grip" aria-hidden="true">
+      <div class="resize-grip-col">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="resize-grip-col">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="resize-arrow" aria-hidden="true">
+      <i class="bi bi-chevron-left"></i>
+    </div>
+  </div>
 
   <!-- ── Sidebar: PQ360 Assistant ─────────────────── -->
   <div class="sidebar" role="complementary" aria-label="PQ360 Assistant">
@@ -870,10 +908,7 @@
       <div class="chat-msg bot">
         <div class="avatar" aria-hidden="true">AI</div>
         <div class="chat-bubble">
-          Hi — tell me how you'd like to refine the draft and I'll apply changes directly in your editor. Try:<br><br>
-          <em>"Make the opening more concise."</em><br>
-          <em>"Strengthen the international cooperation angle."</em><br>
-          <em>"Add the four-fold APT statistic from source 05."</em>
+          Hi — tell me how you'd like to refine the draft and I'll apply changes directly in your editor. 
         </div>
       </div>
     </div>
