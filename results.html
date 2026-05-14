@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PQ360 — Draft Workspace</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@govtechsg/sgds@2.2.0/css/sgds.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    body { display: flex; flex-direction: column; font-size: 15px; }
+
+    /* ── Top nav ─────────────────────────────────────── */
+    .top-nav {
+      height: 52px; flex-shrink: 0;
+      background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center;
+      padding: 0 20px; gap: 10px;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.05);
+      z-index: 10;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: #4f46e5;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 900; font-size: 11px; letter-spacing: -0.5px;
+    }
+    .nav-logo-text { font-weight: 800; font-size: 0.9375rem; color: #0f172a; letter-spacing: -0.02em; }
+    .nav-div { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+    .nav-breadcrumb { display: flex; align-items: center; gap: 5px; font-size: 0.8125rem; }
+    .nav-crumb { color: #64748b; cursor: pointer; transition: color 0.15s; }
+    .nav-crumb:hover { color: #4f46e5; }
+    .nav-crumb-sep { color: #cbd5e1; }
+    .nav-crumb-current { color: #0f172a; font-weight: 600; }
+    .nav-spacer { flex: 1; }
+    .nav-save { display: flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: #94a3b8; }
+    .nav-save-dot { width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+    .nav-icon-btn {
+      width: 32px; height: 32px; border: none; border-radius: 7px;
+      background: transparent; color: #64748b; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-icon-btn:hover { background: #f1f5f9; color: #0f172a; }
+    .btn-export {
+      display: flex; align-items: center; gap: 5px;
+      background: #fff; border: 1.5px solid #e2e8f0; color: #334155;
+      border-radius: 7px; padding: 5px 13px;
+      font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; font-family: inherit; min-height: 32px;
+    }
+    .btn-export:hover { border-color: #c7d2fe; color: #4f46e5; }
+    .btn-submit-review {
+      display: flex; align-items: center; gap: 5px;
+      background: #4f46e5; color: #fff; border: none;
+      border-radius: 7px; padding: 5px 14px;
+      font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; font-family: inherit; min-height: 32px;
+    }
+    .btn-submit-review:hover { background: #3730a3; box-shadow: 0 2px 8px rgba(79,70,229,0.3); }
+
+    /* ── Workspace ───────────────────────────────────── */
+    .workspace {
+      flex: 1; display: flex; overflow: hidden;
+      gap: 12px; background: #f1f5f9; padding: 16px 80px;
+    }
+    .main-col {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; min-width: 0; gap: 12px;
+    }
+
+    /* ── Resize handle ───────────────────────────────── */
+    .resize-handle {
+      width: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: col-resize;
+    }
+    .resize-handle::before {
+      content: ''; width: 3px; height: 32px; border-radius: 99px;
+      background: #cbd5e1; transition: background 0.15s, height 0.15s;
+    }
+    .resize-handle:hover::before,
+    .resize-handle.dragging::before { background: #4f46e5; height: 48px; }
+
+    /* ── Info panel ──────────────────────────────────── */
+    .info-panel {
+      flex-shrink: 0; display: flex; flex-direction: column;
+      background: #fff; border-radius: 10px; overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .info-tab-bar {
+      display: flex; align-items: stretch;
+      padding: 0 14px 0 20px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff; flex-shrink: 0; height: 44px;
+    }
+    .info-tab {
+      display: flex; align-items: center; gap: 5px;
+      padding: 0 12px; height: 44px;
+      font-size: 0.8125rem; font-weight: 500; color: #64748b;
+      background: transparent; border: none;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      cursor: pointer; transition: all 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .info-tab:hover { color: #0f172a; }
+    .info-tab:focus-visible { outline: 2px solid #6366f1; outline-offset: -2px; border-radius: 4px; }
+    .info-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+    .tab-badge {
+      background: #f1f5f9; color: #64748b;
+      border-radius: 99px; padding: 1px 6px;
+      font-size: 0.6875rem; font-weight: 700; line-height: 1.6;
+    }
+    .info-tab.active .tab-badge { background: #eef2ff; color: #4f46e5; }
+    .tab-pill {
+      background: #f1f5f9; color: #94a3b8;
+      border-radius: 4px; padding: 1px 5px;
+      font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .info-tab.active .tab-pill { background: #eef2ff; color: #6366f1; }
+    .info-tab-actions {
+      margin-left: auto; display: flex; align-items: center; gap: 4px;
+    }
+    .btn-tab-icon {
+      width: 30px; height: 30px; border: none; border-radius: 6px;
+      background: transparent; color: #94a3b8; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; transition: all 0.15s;
+    }
+    .btn-tab-icon:hover { background: #f1f5f9; color: #475569; }
+
+    /* Metadata row */
+    .pq-meta-row {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 20px;
+      padding: 8px 20px; border-bottom: 1px solid #f1f5f9;
+      background: #fafafa; flex-shrink: 0;
+    }
+    .pq-meta-item { display: flex; align-items: center; gap: 6px; }
+    .pq-meta-key {
+      font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8;
+    }
+    .pq-meta-val { font-size: 0.8125rem; font-weight: 500; color: #334155; }
+    .pq-meta-badge {
+      background: #fffbeb; color: #92400e;
+      border-radius: 4px; padding: 1px 7px;
+      font-size: 0.75rem; font-weight: 700;
+    }
+
+    /* Tab panels */
+    .ipanel { display: none; overflow-y: auto; padding: 14px 20px; }
+    .ipanel.active { display: block; }
+    .ipanel.pq-panel { max-height: 170px; }
+    .ipanel.mp-panel,
+    .ipanel.ai-panel { height: 162px; }
+    .ipanel { background: #fff; }
+
+    .pq-question {
+      font-size: 0.9375rem; font-weight: 400; color: #1e293b;
+      line-height: 1.75; margin-bottom: 12px;
+    }
+    .pq-question strong { font-weight: 700; color: #0f172a; }
+    .pq-part {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #eef2ff; color: #4f46e5;
+      border-radius: 5px; width: 20px; height: 20px;
+      font-size: 0.6875rem; font-weight: 700;
+      margin: 0 2px; vertical-align: middle;
+    }
+    .pq-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pq-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 0.75rem; font-weight: 500; color: #475569;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .pq-tag-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .pq-tag-deadline { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+
+    .mp-grid { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 20px; align-items: start; }
+    .mp-profile { display: flex; flex-direction: column; gap: 6px; }
+    .mp-profile-top { display: flex; align-items: center; gap: 10px; }
+    .mp-avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: #4f46e5;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.875rem; font-weight: 700;
+    }
+    .mp-name { font-size: 0.9375rem; font-weight: 700; color: #0f172a; }
+    .mp-sub  { font-size: 0.8125rem; color: #64748b; line-height: 1.4; }
+    .mp-insight-title {
+      font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #64748b; margin-bottom: 5px;
+    }
+    .mp-insight-text { font-size: 0.875rem; color: #334155; line-height: 1.65; }
+
+    .ai-draft-hint {
+      font-size: 0.8125rem; color: #64748b; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ipanel.ai-panel p { font-size: 0.9375rem; line-height: 1.85; color: #1e293b; }
+    .ipanel.ai-panel p + p { margin-top: 10px; }
+
+    /* ── Editor ──────────────────────────────────────── */
+    .editor-wrap {
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
+      background: #fff; border-radius: 10px; overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .editor-hd {
+      flex-shrink: 0; background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 9px 14px 9px 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .editor-hd-icon { color: #4f46e5; font-size: 0.875rem; flex-shrink: 0; }
+    .editor-hd-title { font-size: 0.9375rem; font-weight: 700; color: #0f172a; }
+    .editor-hd-ver {
+      background: #f1f5f9; color: #475569;
+      border-radius: 5px; padding: 2px 8px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .editor-hd-time { font-size: 0.8125rem; color: #94a3b8; }
+    .editor-hd-undo {
+      width: 28px; height: 28px; border: none; border-radius: 6px;
+      background: transparent; color: #94a3b8; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.875rem; transition: all 0.15s;
+    }
+    .editor-hd-undo:hover { background: #f1f5f9; color: #475569; }
+    .btn-request-review {
+      margin-left: auto; display: flex; align-items: center; gap: 5px;
+      background: #fff; border: 1.5px solid #e2e8f0; color: #334155;
+      border-radius: 7px; padding: 5px 12px;
+      font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; font-family: inherit; min-height: 30px;
+    }
+    .btn-request-review:hover { border-color: #c7d2fe; color: #4f46e5; }
+    .editor-toolbar {
+      display: flex; align-items: center; gap: 2px;
+      padding: 6px 14px 6px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff; flex-shrink: 0; flex-wrap: wrap;
+    }
+    .toolbar-sep { width: 1px; height: 16px; background: #e2e8f0; margin: 0 5px; }
+    .reading-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: #f0fdf4; color: #15803d;
+      border: 1px solid #bbf7d0; border-radius: 99px; padding: 2px 10px;
+      font-size: 0.75rem; font-weight: 600; flex-shrink: 0;
+    }
+    /* #64748b on white = 4.78:1 ✓ */
+    .word-count { font-size: 0.8125rem; color: #64748b; font-variant-numeric: tabular-nums; }
+    .editor-area {
+      flex: 1; min-height: 0; overflow-y: auto;
+      padding: 22px 28px 22px 24px;
+      font-size: 1rem; line-height: 1.9; color: #1e293b;
+      background: #fff; outline: none; transition: box-shadow 0.2s;
+    }
+    /* placeholder exempt from 4.5:1 per WCAG 2.1 SC 1.4.3 */
+    .editor-area:empty::before { content: attr(data-placeholder); color: #94a3b8; pointer-events: none; }
+    .editor-area:focus { box-shadow: inset 0 0 0 2px rgba(79,70,229,0.08); }
+    .editor-footer {
+      padding: 9px 14px 9px 20px; background: #fafafa;
+      border-top: 1px solid #e2e8f0;
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .starter-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: #fff; border: 1.5px solid #e2e8f0; color: #475569;
+      border-radius: 7px; padding: 5px 11px;
+      font-size: 0.8125rem; font-weight: 500; cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .starter-btn:hover { border-color: #c7d2fe; color: #4f46e5; background: #f5f7ff; }
+    .footer-shortcut {
+      margin-left: auto; font-size: 0.8125rem; color: #94a3b8;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .kbd {
+      background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px;
+      padding: 1px 5px; font-size: 0.75rem; color: #64748b; font-family: inherit;
+    }
+
+    /* ── Sources panel ───────────────────────────────── */
+    .sources-panel {
+      flex: 0 0 220px; display: flex; flex-direction: column;
+      overflow: hidden; background: #fff;
+      border-radius: 10px; border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .sources-panel-hd {
+      flex-shrink: 0; padding: 10px 14px 10px 20px;
+      background: #fff; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sources-panel-title {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.875rem; font-weight: 700; color: #0f172a;
+    }
+    .src-header-icon {
+      width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0;
+      background: #047857;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.7rem;
+    }
+    .sources-panel-stats { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .sources-panel-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .sources-panel-tabs {
+      display: flex; gap: 2px; padding: 6px 14px 6px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fafafa; flex-shrink: 0;
+    }
+    .sources-panel-tabs .tab-btn { color: #64748b; font-size: 0.8125rem; padding: 4px 10px; min-height: 28px; }
+    .sources-panel-tabs .tab-btn.active { background: #fff; color: #047857; border: 1px solid #e2e8f0; border-radius: 6px; }
+    .sources-panel-tabs .tab-btn:not(.active):hover { background: #f1f5f9; color: #047857; border-radius: 6px; }
+    .sources-panel-scroll {
+      flex: 1; overflow-y: auto; padding: 10px 14px 10px 20px; background: #fafafa;
+    }
+    .source-cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .tab-pane        { display: none; }
+    .tab-pane.active { display: block; }
+    .source-card {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 10px 28px 10px 12px;
+      display: flex; align-items: stretch; gap: 8px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative; height: 100%;
+    }
+    .source-card:hover { border-color: #c7d2fe; box-shadow: 0 2px 8px rgba(79,70,229,0.07); }
+    .source-card.highlighted {
+      border-color: #4f46e5 !important;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.15) !important;
+      animation: highlightPulse 0.4s ease;
+    }
+    @keyframes highlightPulse { 0%,100%{ transform:scale(1); } 40%{ transform:scale(1.012); } }
+    .src-num {
+      width: 20px; height: 20px; border-radius: 4px;
+      background: #4f46e5; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.625rem; font-weight: 800; flex-shrink: 0;
+      align-self: flex-start; margin-top: 1px;
+    }
+    .src-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .src-link-btn {
+      position: absolute; top: 8px; right: 8px;
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      color: #cbd5e1; border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+      text-decoration: none; font-size: 0.7rem;
+    }
+    .src-link-btn:hover { color: #4f46e5; background: #eef2ff; }
+    .src-link-btn::after { content: none !important; }
+    .src-title   { font-size: 0.8125rem; font-weight: 700; color: #0f172a; line-height: 1.4; margin-bottom: 2px; }
+    .src-meta    { font-size: 0.75rem; color: #64748b; margin-bottom: 4px; }
+    .src-excerpt {
+      font-size: 0.75rem; color: #475569; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .src-footer { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 6px; flex-wrap: wrap; }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      width: 340px; min-width: 240px; max-width: 580px; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      background: #fff; overflow: hidden; border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .sidebar-hd {
+      padding: 12px 14px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: flex-start; gap: 10px; flex-shrink: 0;
+      background: #fff;
+    }
+    .asst-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #4f46e5;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.875rem; flex-shrink: 0; margin-top: 1px;
+    }
+    .asst-info { flex: 1; min-width: 0; }
+    .asst-name { font-size: 0.9375rem; font-weight: 700; color: #0f172a; line-height: 1.3; }
+    .asst-sub  { font-size: 0.75rem; color: #64748b; margin-top: 1px; }
+    .asst-model {
+      background: #f1f5f9; color: #475569;
+      border: 1px solid #e2e8f0; border-radius: 5px;
+      padding: 2px 8px; font-size: 0.6875rem; font-weight: 600;
+      flex-shrink: 0; align-self: center; white-space: nowrap;
+    }
+    .online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #15803d; box-shadow: 0 0 0 2px #dcfce7;
+      flex-shrink: 0; align-self: center;
+    }
+    .chat-area {
+      flex: 1; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-input-area { padding: 10px 14px; border-top: 1px solid #e2e8f0; flex-shrink: 0; }
+    .chat-row { display: flex; gap: 7px; align-items: flex-end; }
+    .chat-input {
+      flex: 1; border: 1.5px solid #e2e8f0; border-radius: 8px;
+      padding: 8px 12px; font-size: 0.875rem; font-family: inherit;
+      outline: none; resize: none; max-height: 80px; min-height: 38px;
+      line-height: 1.55; color: #1e293b; background: #f8fafc;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .chat-input:focus { border-color: #4f46e5; background: #fff; }
+    .chat-input::placeholder { color: #94a3b8; }
+    .btn-send {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: #4f46e5; border: none; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; font-size: 0.875rem;
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .btn-send:hover { background: #3730a3; box-shadow: 0 2px 8px rgba(79,70,229,0.3); }
+
+    /* Suggested follow-ups */
+    .followups-section {
+      border-top: 1px solid #e2e8f0; flex-shrink: 0;
+      padding: 10px 14px 12px;
+    }
+    .followups-label {
+      font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 8px;
+    }
+    .followups-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+    .followup-chip {
+      display: flex; align-items: center; gap: 4px;
+      background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 0.75rem; font-weight: 500; cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .followup-chip:hover { border-color: #c7d2fe; color: #4f46e5; background: #eef2ff; }
+    .followup-chip i { font-size: 0.7rem; color: #94a3b8; }
+    .followup-chip:hover i { color: #6366f1; }
+
+    /* ── Animations ──────────────────────────────────── */
+    @keyframes editFlash {
+      0%   { box-shadow: inset 0 0 0 2px rgba(3,105,161,0.35); }
+      100% { box-shadow: none; }
+    }
+    .editor-area.flash { animation: editFlash 1.4s ease forwards; }
+
+    /* ── Utility ─────────────────────────────────────── */
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<nav class="top-nav" aria-label="Main navigation">
+  <a href="index_02.html" class="nav-logo" aria-label="PQ360 home">
+    <div class="nav-logo-mark" aria-hidden="true">PQ</div>
+    <span class="nav-logo-text">PQ360</span>
+  </a>
+  <div class="nav-div" aria-hidden="true"></div>
+  <div class="nav-spacer"></div>
+  <button class="btn-export" onclick="exportDraft()" aria-label="Export draft as text file">
+    <i class="bi bi-download" aria-hidden="true"></i> Export
+  </button>
+  <button class="btn-submit-review" aria-label="Submit draft for review">
+    <i class="bi bi-send-fill" aria-hidden="true"></i> Submit for review
+  </button>
+</nav>
+
+<div class="workspace">
+
+  <!-- ── Main column ───────────────────────────────── -->
+  <div class="main-col">
+
+    <!-- ══ Info panel ════════════════════════════════ -->
+    <div class="info-panel">
+
+      <!-- Underline tab bar -->
+      <div class="info-tab-bar" role="tablist" aria-label="Question context">
+        <button class="info-tab active" role="tab" id="itab-pq"
+          aria-selected="true" aria-controls="ipanel-pq"
+          onclick="switchInfoTab('pq', this)">
+          <i class="bi bi-file-text" aria-hidden="true"></i> PQ Details
+        </button>
+        <button class="info-tab" role="tab" id="itab-mp"
+          aria-selected="false" aria-controls="ipanel-mp"
+          onclick="switchInfoTab('mp', this)">
+          <i class="bi bi-person" aria-hidden="true"></i> MP Insights
+        </button>
+        <button class="info-tab" role="tab" id="itab-ai"
+          aria-selected="false" aria-controls="ipanel-ai"
+          onclick="switchInfoTab('ai', this)">
+          <i class="bi bi-stars" aria-hidden="true"></i> AI Draft
+        </button>
+        <div class="info-tab-actions">
+          <button class="btn-tab-icon" aria-label="More options">
+            <i class="bi bi-three-dots" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Metadata row -->
+       <!-- 
+      <div class="pq-meta-row" aria-label="Question metadata">
+        <div class="pq-meta-item">
+          <span class="pq-meta-key">Filed</span>
+          <span class="pq-meta-val">12 May 2026, 09:42</span>
+        </div>
+        <div class="pq-meta-item">
+          <span class="pq-meta-key">Sitting</span>
+          <span class="pq-meta-val">20 May 2026</span>
+        </div>
+        <div class="pq-meta-item">
+          <span class="pq-meta-key">Type</span>
+          <span class="pq-meta-badge">Oral · Priority</span>
+        </div>
+        <div class="pq-meta-item">
+          <span class="pq-meta-key">Ref</span>
+          <span class="pq-meta-val">MDDI/PQ/2026/118</span>
+        </div>
+      </div>
+      -->
+
+      <!-- PQ Details panel -->
+      <div class="ipanel pq-panel active" id="ipanel-pq"
+        role="tabpanel" aria-labelledby="itab-pq" tabindex="0">
+        <p class="pq-question">
+          <strong>Mr Saktiandi Supaat</strong> asked the Minister for Digital Development and Information
+          <span class="pq-part" aria-label="part a">a</span> what is the Government's assessment of the risks from AI models claiming to be sufficiently advanced to steal data or disrupt critical infrastructure, to Singapore's financial system and critical infrastructure;
+          <span class="pq-part" aria-label="part b">b</span> whether such AI-enabled cyber risks could constitute a new class of systemic financial risk; and
+          <span class="pq-part" aria-label="part c">c</span> what early-warning indicators or triggers, if any, are being developed to detect such threats.
+        </p>
+        <!--
+        <div class="pq-tags" role="list" aria-label="Question topics">
+          <span class="pq-tag" role="listitem"><span class="pq-tag-dot" style="background:#4f46e5;" aria-hidden="true"></span>AI safety</span>
+          <span class="pq-tag" role="listitem"><span class="pq-tag-dot" style="background:#0369a1;" aria-hidden="true"></span>Cybersecurity</span>
+          <span class="pq-tag" role="listitem"><span class="pq-tag-dot" style="background:#047857;" aria-hidden="true"></span>Financial stability</span>
+          <span class="pq-tag" role="listitem"><span class="pq-tag-dot" style="background:#6366f1;" aria-hidden="true"></span>Critical infrastructure</span>
+          <span class="pq-tag pq-tag-deadline" role="listitem"><i class="bi bi-clock" aria-hidden="true"></i> Draft due in 3 days</span>
+        </div>
+        -->
+      </div>
+
+      <!-- MP Insights panel -->
+      <div class="ipanel mp-panel" id="ipanel-mp"
+        role="tabpanel" aria-labelledby="itab-mp" tabindex="0">
+        <div class="mp-grid">
+          <div class="mp-profile">
+            <div class="mp-profile-top">
+              <div class="mp-avatar" aria-hidden="true">SS</div>
+              <div>
+                <div class="mp-name">Mr Saktiandi Supaat</div>
+                <div class="mp-sub">PAP · Bishan-Toa Payoh GRC</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">
+              <!--
+              <span class="badge badge-teal" style="font-size:0.7rem;">9 past PQs</span>
+              -->
+            </div>
+          </div>
+          <div>
+            <div class="mp-insight-title" id="insight-stance">Stance on Topic</div>
+            <div class="mp-insight-text" aria-labelledby="insight-stance">Proactively tracks AI and cybersecurity developments. Has raised questions on fintech resilience, digital infrastructure reliability, and AI governance. Constructive but expects concrete operational details — not high-level reassurances.</div>
+          </div>
+          <div>
+            <div class="mp-insight-title" id="insight-intent">Inferred Intent</div>
+            <div class="mp-insight-text" aria-labelledby="insight-intent">Likely seeking to put on record the Government's preparedness posture given rising AI-enabled threat concerns in Singapore's financial sector. Recommend citing specific CSA measures and confirming Singapore is not dependent on any single external vendor.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Draft panel -->
+      <div class="ipanel ai-panel" id="ipanel-ai"
+        role="tabpanel" aria-labelledby="itab-ai" tabindex="0">
+        <div class="ai-draft-hint">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          Read-only reference — click <span style="background:#4f46e5;color:#fff;border-radius:3px;padding:0 5px;font-size:0.7rem;font-weight:800;">[n]</span> on a citation to highlight its source below.
+        </div>
+        <div id="aiDraft" aria-label="AI generated draft, read-only">
+          <p>Mr Speaker, I thank Mr Saktiandi Supaat for his question. The Government treats AI-enabled cyber risks as a serious and evolving threat to Singapore's digital and financial infrastructure.</p>
+          <p>The Cyber Security Agency of Singapore (CSA) assesses AI-enabled cyber risk as an amplification of existing systemic risk, rather than a wholly new category. <a class="citation" data-src="1" onclick="highlightSource(1)" aria-label="Source 1: MDDI Response on AI-Enabled Cyber Risks, Hansard 5 May 2026">[1]</a> Threat actors are increasingly exploiting AI tools to develop sophisticated malware. Google's 2025 Threat Horizons Report documented actors deploying AI-generated malware — PROMPTFLUX — that consults a live AI model during attacks to rewrite its own code in real-time and evade detection. <a class="citation" data-src="2" onclick="highlightSource(2)" aria-label="Source 2: Google Threat Horizons Report 2025">[2]</a></p>
+          <p>We have also seen AI-enabled social engineering attacks with severe financial consequences. In 2024, criminals used AI-generated deepfake video calls to impersonate a Chief Financial Officer, deceiving an employee into transferring USD $25.6 million. <a class="citation" data-src="3" onclick="highlightSource(3)" aria-label="Source 3: AI Deepfake CFO Fraud Case, 2024">[3]</a></p>
+          <p>To address these risks, CSA has written to Critical Information Infrastructure (CII) owners with five priority actions: conducting updated AI-threat risk assessments; ensuring full asset visibility; accelerating patching cycles; governing the use of AI tools within their operations; and deploying AI-powered defences. <a class="citation" data-src="4" onclick="highlightSource(4)" aria-label="Source 4: CSA CII Advisory 2026">[4]</a></p>
+          <p>Internationally, we engage like-minded partners through CERT exchanges and the ASEAN Regional Computer Emergency Response Team (APCERT) to share threat intelligence and coordinate responses. <a class="citation" data-src="5" onclick="highlightSource(5)" aria-label="Source 5: MDDI Response on CII Protection, Hansard 22 Sep 2025">[5]</a></p>
+        </div>
+      </div>
+
+    </div><!-- .info-panel -->
+
+    <!-- ══ Editor ════════════════════════════════════ -->
+    <div class="editor-wrap">
+      <div class="editor-hd">
+        <i class="bi bi-pen-fill editor-hd-icon" aria-hidden="true"></i>
+        <span class="editor-hd-title">Your Draft</span>
+        </button>
+      </div>
+      <div class="editor-toolbar" role="toolbar" aria-label="Text formatting toolbar">
+        <button class="btn-icon" onclick="execCmd('bold')"      style="font-weight:800;"           aria-label="Bold"          title="Bold (⌘B)">B</button>
+        <button class="btn-icon" onclick="execCmd('italic')"    style="font-style:italic;"         aria-label="Italic"        title="Italic (⌘I)">I</button>
+        <button class="btn-icon" onclick="execCmd('underline')" style="text-decoration:underline;" aria-label="Underline"     title="Underline">U</button>
+        <div class="toolbar-sep" role="separator"></div>
+        <button class="btn-icon" onclick="execCmd('insertUnorderedList')" aria-label="Bullet list"   title="Bullet list"><i class="bi bi-list-ul" aria-hidden="true"></i></button>
+        <button class="btn-icon" onclick="execCmd('insertOrderedList')"   aria-label="Numbered list" title="Numbered list"><i class="bi bi-list-ol" aria-hidden="true"></i></button>
+        <div class="toolbar-sep" role="separator"></div>
+        <button class="btn-icon" onclick="execCmd('undo')" aria-label="Undo" title="Undo"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i></button>
+        <button class="btn-icon" onclick="execCmd('redo')" aria-label="Redo" title="Redo"><i class="bi bi-arrow-clockwise"        aria-hidden="true"></i></button>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+          <span class="word-count" id="wordCount" aria-live="polite" aria-atomic="true">0 / ~350 words</span>
+        </div>
+      </div>
+      <div class="editor-area" id="editorArea" contenteditable="true"
+        role="textbox" aria-multiline="true" aria-label="Draft editor. Use the toolbar above to format text."
+        data-placeholder="Start typing your response, or pick a starter below…"></div>
+      <div class="editor-footer">
+        <button class="starter-btn" onclick="copyFromDraft()" aria-label="Use AI draft as starting point">
+          <i class="bi bi-stars" aria-hidden="true"></i> Use AI draft as starting point
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ Source Intelligence ════════════════════════ -->
+    <div class="sources-panel" aria-label="Source Intelligence panel">
+      <div class="sources-panel-hd">
+        <div class="sources-panel-title">
+          <div class="src-header-icon" aria-hidden="true"><i class="bi bi-database-fill"></i></div>
+          Relevant Sources
+        </div>
+        <div class="sources-panel-stats" aria-label="Source statistics">
+          <span class="badge badge-success" style="font-size:0.7rem;"><i class="bi bi-bar-chart-fill" aria-hidden="true"></i> Relevance scored</span>
+        </div>
+      </div>
+      <div class="sources-panel-body">
+        <div class="sources-panel-tabs tabs" role="tablist" aria-label="Source categories">
+          <button class="tab-btn active" role="tab" id="tab-btn-hansard"
+            aria-selected="true" aria-controls="tab-hansard"
+            onclick="switchTab('hansard',this)">
+            <i class="bi bi-journal-richtext" aria-hidden="true"></i> Hansard
+            <span class="badge badge-primary" style="font-size:0.65rem;padding:1px 6px;" aria-label="4 sources">4</span>
+          </button>
+          <button class="tab-btn" role="tab" id="tab-btn-speeches"
+            aria-selected="false" aria-controls="tab-speeches"
+            onclick="switchTab('speeches',this)">
+            <i class="bi bi-mic-fill" aria-hidden="true"></i> Speeches
+            <span class="badge badge-teal" style="font-size:0.65rem;padding:1px 6px;" aria-label="3 sources">3</span>
+          </button>
+          <button class="tab-btn" role="tab" id="tab-btn-others"
+            aria-selected="false" aria-controls="tab-others"
+            onclick="switchTab('others',this)">
+            <i class="bi bi-files" aria-hidden="true"></i> Others
+            <span class="badge badge-accent" style="font-size:0.65rem;padding:1px 6px;" aria-label="5 sources">5</span>
+          </button>
+        </div>
+        <div class="sources-panel-scroll">
+
+          <div class="tab-pane active" id="tab-hansard" role="tabpanel" aria-labelledby="tab-btn-hansard" tabindex="0">
+            <div class="source-cards-grid">
+              <div class="source-card" id="src-1">
+                <div class="src-num" aria-hidden="true">1</div>
+                <div class="src-body">
+                  <div class="src-title">MDDI Response to PQ on AI-Enabled Cybersecurity Risks</div>
+                  <div class="src-meta">Hansard · 5 May 2026</div>
+                  <div class="src-excerpt">"CSA assesses AI-enabled cyber risk as an amplification of existing systemic risk."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 96">96</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                    <span class="src-cite">[1]</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-5">
+                <div class="src-num" aria-hidden="true">5</div>
+                <div class="src-body">
+                  <div class="src-title">MDDI Response to PQ on Strengthening CII Protection</div>
+                  <div class="src-meta">Hansard · 22 Sep 2025</div>
+                  <div class="src-excerpt">"APT attacks on Singapore's CII increased more than four-fold between 2021 and 2024."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 82">82</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                    <span class="src-cite">[5]</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-6">
+                <div class="src-num" style="background:var(--warning);" aria-hidden="true">6</div>
+                <div class="src-body">
+                  <div class="src-title">MDDI Response to PQ on National-Level AI Task Force</div>
+                  <div class="src-meta">Hansard · 26 Sep 2025</div>
+                  <div class="src-excerpt">"Singapore's approach emphasises stakeholder ownership through the National AI Strategy 2.0."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 71">71</div>
+                    <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-7">
+                <div class="src-num" style="background:var(--warning);" aria-hidden="true">7</div>
+                <div class="src-body">
+                  <div class="src-title">MDDI Response to PQ on Training PMETs in AI</div>
+                  <div class="src-meta">Hansard · 18 Feb 2025</div>
+                  <div class="src-excerpt">"Ministry will provide an update on AI skills training at the upcoming COS debate."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 63">63</div>
+                    <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="tab-speeches" role="tabpanel" aria-labelledby="tab-btn-speeches" tabindex="0">
+            <div class="source-cards-grid">
+              <div class="source-card" id="src-2">
+                <div class="src-num" style="background:var(--teal);" aria-hidden="true">2</div>
+                <div class="src-body">
+                  <div class="src-title">Google Threat Horizons Report 2025 — AI-Enabled Malware</div>
+                  <div class="src-meta">Google Cloud Security · 2025</div>
+                  <div class="src-excerpt">"PROMPTFLUX — malware that consults a live AI model during attacks to rewrite its own code in real-time."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 93">93</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                    <span class="src-cite">[2]</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-3">
+                <div class="src-num" style="background:var(--teal);" aria-hidden="true">3</div>
+                <div class="src-body">
+                  <div class="src-title">AI Deepfake CFO Fraud — Hong Kong Case Study</div>
+                  <div class="src-meta">Reuters / SCMP · Feb 2024</div>
+                  <div class="src-excerpt">"Criminals used AI-generated deepfake video calls to impersonate a CFO, transferring USD $25.6 million."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 89">89</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                    <span class="src-cite">[3]</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-4">
+                <div class="src-num" style="background:var(--teal);" aria-hidden="true">4</div>
+                <div class="src-body">
+                  <div class="src-title">CSA Advisory to CII Owners on AI Cyber Threats</div>
+                  <div class="src-meta">Cyber Security Agency · 2026</div>
+                  <div class="src-excerpt">"Five priority actions: updated risk assessments, full asset visibility, accelerated patching, governed AI use, AI-powered defences."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 97">97</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                    <span class="src-cite">[4]</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="tab-others" role="tabpanel" aria-labelledby="tab-btn-others" tabindex="0">
+            <div class="source-cards-grid">
+              <div class="source-card" id="src-8">
+                <div class="src-num" style="background:var(--warning);" aria-hidden="true">8</div>
+                <div class="src-body">
+                  <div class="src-title">Singapore National AI Strategy 2.0</div>
+                  <div class="src-meta">MDDI · Launched Nov 2023</div>
+                  <div class="src-excerpt">"Sets out Singapore's approach to maximising opportunities from AI and building an AI-enabled economy."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 74">74</div>
+                    <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-9">
+                <div class="src-num" style="background:var(--warning);" aria-hidden="true">9</div>
+                <div class="src-body">
+                  <div class="src-title">Singapore Cybersecurity Strategy 2021</div>
+                  <div class="src-meta">CSA Singapore · Oct 2021</div>
+                  <div class="src-excerpt">"Four pillars: resilient infrastructure, safer cyberspace, international cooperation, cyber ecosystem."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 68">68</div>
+                    <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+              <div class="source-card" id="src-10">
+                <div class="src-num" style="background:var(--primary-mid);" aria-hidden="true">10</div>
+                <div class="src-body">
+                  <div class="src-title">Mr Saktiandi Supaat — Past PQs on Digital (2022–2025)</div>
+                  <div class="src-meta">MP Research · PQ360 Internal</div>
+                  <div class="src-excerpt">"Filed 4 prior questions on digital infrastructure, AI governance, and fintech resilience."</div>
+                  <div class="src-footer">
+                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 86">86</div>
+                    <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
+                  </div>
+                </div>
+                <a class="src-link-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open source in new tab"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- .sources-panel -->
+
+  </div><!-- .main-col -->
+
+  <!-- ── Resize handle ─────────────────────────────── -->
+  <div class="resize-handle" id="resizeHandle"
+    role="separator" aria-orientation="vertical"
+    aria-label="Drag to resize assistant panel" title="Drag to resize"></div>
+
+  <!-- ── Sidebar: PQ360 Assistant ─────────────────── -->
+  <div class="sidebar" role="complementary" aria-label="PQ360 Assistant">
+    <div class="sidebar-hd">
+      <div class="asst-icon" aria-hidden="true"><i class="bi bi-stars"></i></div>
+      <div class="asst-info">
+        <div class="asst-name">PQ360 Assistant</div>
+      </div>
+      <!-- 
+      <div class="online-dot" aria-label="Connected" title="Connected"></div>
+      -->
+    </div>
+
+    <div class="chat-area" id="chatArea" aria-live="polite" aria-label="Chat history">
+      <div class="chat-msg bot">
+        <div class="avatar" aria-hidden="true">AI</div>
+        <div class="chat-bubble">
+          Hi — tell me how you'd like to refine the draft and I'll apply changes directly in your editor. Try:<br><br>
+          <em>"Make the opening more concise."</em><br>
+          <em>"Strengthen the international cooperation angle."</em><br>
+          <em>"Add the four-fold APT statistic from source 05."</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="chat-row">
+        <label for="chatInput" class="visually-hidden">Message the assistant</label>
+        <textarea class="chat-input" id="chatInput" rows="1"
+          placeholder="Instruct the assistant…"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+        <button class="btn-send" onclick="sendChat()" aria-label="Send message">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Suggested follow-ups -->
+    <div class="followups-section">
+      <div class="followups-label">Suggested follow-ups</div>
+      <div class="followups-grid">
+        <button class="followup-chip" onclick="sendPrompt('Make it more concise')">
+          <i class="bi bi-arrows-collapse" aria-hidden="true"></i> More concise
+        </button>
+        <button class="followup-chip" onclick="sendPrompt('Strengthen the cybersecurity commitment')">
+          <i class="bi bi-check-circle" aria-hidden="true"></i> Firm commitment
+        </button>
+        <button class="followup-chip" onclick="sendPrompt('Rewrite the opening paragraph')">
+          <i class="bi bi-pencil" aria-hidden="true"></i> Rewrite opener
+        </button>
+        <button class="followup-chip" onclick="sendPrompt('Add AI threat statistics')">
+          <i class="bi bi-bar-chart" aria-hidden="true"></i> Add data
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .workspace -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+// ── Info panel tabs ───────────────────────────────────
+function switchInfoTab(tab, btn) {
+  document.querySelectorAll('.ipanel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.info-tab').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  document.getElementById('ipanel-' + tab).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+}
+
+// ── Source tabs ───────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sources-panel-tabs .tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+}
+
+// ── Citation highlight ────────────────────────────────
+function highlightSource(num) {
+  document.querySelectorAll('.source-card.highlighted').forEach(c => c.classList.remove('highlighted'));
+  document.querySelectorAll('.citation.active').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.citation[data-src="' + num + '"]').forEach(c => c.classList.add('active'));
+  const srcEl = document.getElementById('src-' + num);
+  if (!srcEl) return;
+  const pane = srcEl.closest('.tab-pane');
+  if (pane) {
+    const tabId = pane.id.replace('tab-', '');
+    const btn = document.getElementById('tab-btn-' + tabId);
+    if (btn) switchTab(tabId, btn);
+  }
+  srcEl.classList.add('highlighted');
+  srcEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Editor ────────────────────────────────────────────
+const editor = document.getElementById('editorArea');
+
+function execCmd(cmd) { document.execCommand(cmd, false, null); editor.focus(); updateWordCount(); }
+
+function updateWordCount() {
+  const text = editor.innerText.trim();
+  const w = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  document.getElementById('wordCount').textContent = w + ' / ~350 words';
+}
+editor.addEventListener('input', updateWordCount);
+
+function copyFromDraft() {
+  editor.innerHTML = document.getElementById('aiDraft').innerHTML;
+  editor.querySelectorAll('.citation').forEach(c => {
+    c.replaceWith(document.createTextNode('[' + c.getAttribute('data-src') + ']'));
+  });
+  editor.focus(); updateWordCount();
+}
+
+function flashEditor() {
+  editor.classList.remove('flash'); void editor.offsetWidth;
+  editor.classList.add('flash'); setTimeout(() => editor.classList.remove('flash'), 1400);
+}
+
+// ── PQ360 Assistant ───────────────────────────────────
+const responses = {
+  concise:  'Done — tightened the draft, removed redundant phrases, condensed paragraph 3. Key commitments preserved.',
+  opening:  'Refreshed — the opener now leads directly with the Ministry\'s commitment, cutting the preamble for a sharper tone.',
+  data:     'Added — the four-fold APT increase statistic from source 05 now appears in paragraph 2.',
+  stress:   'Checked — claims are well-sourced. One area to strengthen: the "no single external vendor" commitment could cite the in-house AI capability initiative more explicitly.',
+  default:  'Applied your instructions to the editor. Review the changes and let me know if you\'d like anything further.'
+};
+function getKey(m) {
+  m = m.toLowerCase();
+  if (/concise|short|trim/.test(m))          return 'concise';
+  if (/open|intro|start/.test(m))            return 'opening';
+  if (/data|stat|number|four.fold|apt/.test(m)) return 'data';
+  if (/stress|test|claim|check/.test(m))     return 'stress';
+  return 'default';
+}
+function appendMsg(text, role) {
+  const a = document.getElementById('chatArea');
+  const d = document.createElement('div');
+  d.className = 'chat-msg ' + role;
+  d.innerHTML = `<div class="avatar" aria-hidden="true">${role === 'user' ? 'Me' : 'AI'}</div><div class="chat-bubble">${text}</div>`;
+  a.appendChild(d); a.scrollTop = a.scrollHeight;
+}
+function appendThinking() {
+  const a = document.getElementById('chatArea');
+  const d = document.createElement('div');
+  d.className = 'chat-msg bot';
+  d.innerHTML = `<div class="avatar" aria-hidden="true">AI</div><div class="chat-bubble"><div class="thinking-dots" aria-label="Thinking"><span></span><span></span><span></span></div></div>`;
+  a.appendChild(d); a.scrollTop = a.scrollHeight; return d;
+}
+async function sendPrompt(t) { document.getElementById('chatInput').value = t; await sendChat(); }
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim(); if (!msg) return;
+  inp.value = ''; appendMsg(msg, 'user');
+  const th = appendThinking();
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 400));
+  th.remove();
+  if (!editor.innerText.trim()) copyFromDraft();
+  appendMsg(responses[getKey(msg)], 'bot'); flashEditor();
+}
+
+// ── Export ────────────────────────────────────────────
+function exportDraft() {
+  const text = editor.innerText || document.getElementById('aiDraft').innerText;
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([text], { type: 'text/plain' })),
+    download: 'PQ360_Draft.txt'
+  });
+  a.click();
+}
+
+// ── Sidebar resize ────────────────────────────────────
+(function() {
+  const handle  = document.getElementById('resizeHandle');
+  const sidebar = document.querySelector('.sidebar');
+  let dragging = false, startX = 0, startW = 0;
+  handle.addEventListener('mousedown', e => {
+    dragging = true; startX = e.clientX; startW = sidebar.offsetWidth;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const newW = Math.max(240, Math.min(580, startW + (startX - e.clientX)));
+    sidebar.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
+updateWordCount();
+</script>
+</body>
+</html>
