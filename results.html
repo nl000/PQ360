@@ -454,6 +454,32 @@
     }
     .editor-area.flash { animation: editFlash 1.4s ease forwards; }
 
+    /* ── Collapse toggles ────────────────────────────── */
+    .btn-collapse {
+      width: 26px; height: 26px; border: none; background: transparent;
+      border-radius: 5px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #94a3b8; font-size: 0.8rem; flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-collapse:hover { color: #475569; background: #f1f5f9; }
+    .btn-collapse .bi { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .info-panel.collapsed    .btn-info-collapse .bi { transform: rotate(180deg); }
+    .sources-panel.collapsed .btn-src-collapse  .bi { transform: rotate(180deg); }
+
+    .info-panel {
+      max-height: 400px;
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    .info-panel.collapsed { max-height: 44px; }
+
+    .sources-panel {
+      max-height: 400px;
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1),
+                  flex-basis 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sources-panel.collapsed { max-height: 42px; flex-basis: 42px; }
+
     /* ── Utility ─────────────────────────────────────── */
     .visually-hidden {
       position: absolute; width: 1px; height: 1px;
@@ -506,8 +532,8 @@
           <i class="bi bi-stars" aria-hidden="true"></i> AI Draft
         </button>
         <div class="info-tab-actions">
-          <button class="btn-tab-icon" aria-label="More options">
-            <i class="bi bi-three-dots" aria-hidden="true"></i>
+          <button class="btn-collapse btn-info-collapse" onclick="toggleInfoPanel()" aria-label="Collapse panel" aria-expanded="true">
+            <i class="bi bi-chevron-up" aria-hidden="true"></i>
           </button>
         </div>
       </div>
@@ -618,9 +644,7 @@
         <div class="toolbar-sep" role="separator"></div>
         <button class="btn-icon" onclick="execCmd('undo')" aria-label="Undo" title="Undo"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i></button>
         <button class="btn-icon" onclick="execCmd('redo')" aria-label="Redo" title="Redo"><i class="bi bi-arrow-clockwise"        aria-hidden="true"></i></button>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-          <span class="word-count" id="wordCount" aria-live="polite" aria-atomic="true">0 / ~350 words</span>
-        </div>
+    
       </div>
       <div class="editor-area" id="editorArea" contenteditable="true"
         role="textbox" aria-multiline="true" aria-label="Draft editor. Use the toolbar above to format text."
@@ -642,6 +666,9 @@
         <div class="sources-panel-stats" aria-label="Source statistics">
           <span class="badge badge-success" style="font-size:0.7rem;"><i class="bi bi-bar-chart-fill" aria-hidden="true"></i> Relevance scored</span>
         </div>
+        <button class="btn-collapse btn-src-collapse" onclick="toggleSourcesPanel()" aria-label="Collapse sources panel" aria-expanded="true">
+          <i class="bi bi-chevron-up" aria-hidden="true"></i>
+        </button>
       </div>
       <div class="sources-panel-body">
         <div class="sources-panel-tabs tabs" role="tablist" aria-label="Source categories">
@@ -1032,6 +1059,21 @@ function exportDraft() {
 })();
 
 updateWordCount();
+
+// ── Panel collapse ────────────────────────────────────
+function toggleInfoPanel() {
+  const panel = document.querySelector('.info-panel');
+  const btn   = document.querySelector('.btn-info-collapse');
+  const collapsed = panel.classList.toggle('collapsed');
+  btn.setAttribute('aria-expanded', String(!collapsed));
+}
+
+function toggleSourcesPanel() {
+  const panel = document.querySelector('.sources-panel');
+  const btn   = document.querySelector('.btn-src-collapse');
+  const collapsed = panel.classList.toggle('collapsed');
+  btn.setAttribute('aria-expanded', String(!collapsed));
+}
 </script>
 </body>
 </html>
