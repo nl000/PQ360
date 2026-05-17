@@ -71,7 +71,7 @@
     }
     .main-col {
       flex: 1; display: flex; flex-direction: column;
-      overflow: hidden; min-width: 0; gap: 12px;
+      overflow: hidden; min-width: 0; gap: 8px;
     }
 
     /* ── Resize handle ───────────────────────────────── */
@@ -119,6 +119,7 @@
       background: #fff; border-radius: 10px; overflow: hidden;
       border: 1px solid #e2e8f0;
       box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+      height: 210px;
     }
     .info-tab-bar {
       display: flex; align-items: stretch;
@@ -181,12 +182,8 @@
     }
 
     /* Tab panels */
-    .ipanel { display: none; overflow-y: auto; padding: 14px 20px; }
-    .ipanel.active { display: block; }
-    .ipanel.pq-panel { max-height: 170px; }
-    .ipanel.mp-panel,
-    .ipanel.ai-panel { height: 162px; }
-    .ipanel { background: #fff; }
+    .ipanel { display: none; overflow-y: auto; padding: 14px 20px; background: #fff; }
+    .ipanel.active { display: block; flex: 1; min-height: 0; }
 
     .pq-question {
       font-size: 0.9375rem; font-weight: 400; color: #1e293b;
@@ -432,13 +429,13 @@
       flex: 1; overflow-y: auto; padding: 14px;
       display: flex; flex-direction: column; gap: 10px;
     }
-    .chat-input-area { padding: 10px 14px; border-top: 1px solid #e2e8f0; flex-shrink: 0; }
+    .chat-input-area { padding: 12px 14px; border-top: 1px solid #e2e8f0; flex-shrink: 0; }
     .chat-row { display: flex; gap: 7px; align-items: flex-end; }
     .chat-input {
-      flex: 1; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      padding: 8px 12px; font-size: 0.875rem; font-family: inherit;
-      outline: none; resize: none; max-height: 80px; min-height: 38px;
-      line-height: 1.55; color: #1e293b; background: #f8fafc;
+      flex: 1; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      padding: 12px 14px; font-size: 0.9375rem; font-family: inherit;
+      outline: none; resize: none; max-height: 140px; min-height: 72px;
+      line-height: 1.6; color: #1e293b; background: #f8fafc;
       transition: border-color 0.15s, background 0.15s;
     }
     .chat-input:focus { border-color: #4f46e5; background: #fff; }
@@ -492,12 +489,33 @@
     .btn-collapse .bi { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); }
     .info-panel.collapsed    .btn-info-collapse .bi { transform: rotate(180deg); }
     .sources-panel.collapsed .btn-src-collapse  .bi { transform: rotate(180deg); }
+    .editor-wrap.collapsed   .btn-editor-collapse .bi { transform: rotate(180deg); }
 
     .info-panel {
-      max-height: 400px;
+      max-height: 1000px;
       transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1);
     }
-    .info-panel.collapsed { max-height: 44px; }
+    .info-panel.collapsed { max-height: 44px; height: auto; }
+
+    .info-resize-handle {
+      flex-shrink: 0; height: 12px; cursor: row-resize;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border-radius: 0 0 6px 6px;
+      transition: background 0.15s;
+      position: relative; z-index: 2;
+    }
+    .info-resize-handle:hover, .info-resize-handle.dragging {
+      background: rgba(79,70,229,0.06);
+    }
+    .info-resize-handle::before {
+      content: '';
+      display: block; width: 36px; height: 3px;
+      border-radius: 99px; background: #c4cdd8;
+      transition: background 0.15s;
+    }
+    .info-resize-handle:hover::before, .info-resize-handle.dragging::before {
+      background: #4f46e5;
+    }
 
     .sources-panel {
       max-height: 400px;
@@ -505,6 +523,12 @@
                   flex-basis 0.28s cubic-bezier(0.4,0,0.2,1);
     }
     .sources-panel.collapsed { max-height: 42px; flex-basis: 42px; }
+
+    .editor-wrap {
+      transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1),
+                  flex 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    .editor-wrap.collapsed { max-height: 46px; flex: none; }
 
     /* ── Utility ─────────────────────────────────────── */
     .visually-hidden {
@@ -542,13 +566,13 @@
 
       <!-- Underline tab bar -->
       <div class="info-tab-bar" role="tablist" aria-label="Question context">
-        <button class="info-tab active" role="tab" id="itab-pq"
-          aria-selected="true" aria-controls="ipanel-pq"
+        <button class="info-tab" role="tab" id="itab-pq"
+          aria-selected="false" aria-controls="ipanel-pq"
           onclick="switchInfoTab('pq', this)">
           <i class="bi bi-file-text" aria-hidden="true"></i> PQ Details
         </button>
-        <button class="info-tab" role="tab" id="itab-mp"
-          aria-selected="false" aria-controls="ipanel-mp"
+        <button class="info-tab active" role="tab" id="itab-mp"
+          aria-selected="true" aria-controls="ipanel-mp"
           onclick="switchInfoTab('mp', this)">
           <i class="bi bi-person" aria-hidden="true"></i> MP Insights
         </button>
@@ -587,7 +611,7 @@
       -->
 
       <!-- PQ Details panel -->
-      <div class="ipanel pq-panel active" id="ipanel-pq"
+      <div class="ipanel pq-panel" id="ipanel-pq"
         role="tabpanel" aria-labelledby="itab-pq" tabindex="0">
         <p class="pq-question">
           <strong>Mr Saktiandi Supaat</strong> asked the Minister for Digital Development and Information
@@ -607,7 +631,7 @@
       </div>
 
       <!-- MP Insights panel -->
-      <div class="ipanel mp-panel" id="ipanel-mp"
+      <div class="ipanel mp-panel active" id="ipanel-mp"
         role="tabpanel" aria-labelledby="itab-mp" tabindex="0">
         <div class="mp-grid">
           <div class="mp-profile">
@@ -652,12 +676,15 @@
       </div>
 
     </div><!-- .info-panel -->
+    <div class="info-resize-handle" id="infoResizeHandle" aria-hidden="true"></div>
 
     <!-- ══ Editor ════════════════════════════════════ -->
     <div class="editor-wrap">
       <div class="editor-hd">
         <i class="bi bi-pen-fill editor-hd-icon" aria-hidden="true"></i>
         <span class="editor-hd-title">Your Draft</span>
+        <button class="btn-collapse btn-editor-collapse" onclick="toggleEditorPanel()" aria-label="Collapse editor" aria-expanded="true" style="margin-left:auto;">
+          <i class="bi bi-chevron-up" aria-hidden="true"></i>
         </button>
       </div>
       <div class="editor-toolbar" role="toolbar" aria-label="Text formatting toolbar">
@@ -683,7 +710,7 @@
     </div>
 
     <!-- ══ Source Intelligence ════════════════════════ -->
-    <div class="sources-panel" aria-label="Source Intelligence panel">
+    <div class="sources-panel collapsed" aria-label="Source Intelligence panel">
       <div class="sources-panel-hd">
         <div class="sources-panel-title">
           <div class="src-header-icon" aria-hidden="true"><i class="bi bi-database-fill"></i></div>
@@ -692,7 +719,7 @@
         <div class="sources-panel-stats" aria-label="Source statistics">
           <span class="badge badge-success" style="font-size:0.7rem;"><i class="bi bi-bar-chart-fill" aria-hidden="true"></i> Relevance scored</span>
         </div>
-        <button class="btn-collapse btn-src-collapse" onclick="toggleSourcesPanel()" aria-label="Collapse sources panel" aria-expanded="true">
+        <button class="btn-collapse btn-src-collapse" onclick="toggleSourcesPanel()" aria-label="Expand sources panel" aria-expanded="false">
           <i class="bi bi-chevron-up" aria-hidden="true"></i>
         </button>
       </div>
@@ -728,7 +755,6 @@
                   <div class="src-meta">Hansard · 5 May 2026</div>
                   <div class="src-excerpt">"CSA assesses AI-enabled cyber risk as an amplification of existing systemic risk."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 96">96</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                     <span class="src-cite">[1]</span>
                   </div>
@@ -742,7 +768,6 @@
                   <div class="src-meta">Hansard · 22 Sep 2025</div>
                   <div class="src-excerpt">"APT attacks on Singapore's CII increased more than four-fold between 2021 and 2024."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 82">82</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                     <span class="src-cite">[5]</span>
                   </div>
@@ -756,7 +781,6 @@
                   <div class="src-meta">Hansard · 26 Sep 2025</div>
                   <div class="src-excerpt">"Singapore's approach emphasises stakeholder ownership through the National AI Strategy 2.0."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 71">71</div>
                     <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
                   </div>
                 </div>
@@ -769,7 +793,6 @@
                   <div class="src-meta">Hansard · 18 Feb 2025</div>
                   <div class="src-excerpt">"Ministry will provide an update on AI skills training at the upcoming COS debate."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 63">63</div>
                     <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
                   </div>
                 </div>
@@ -787,7 +810,6 @@
                   <div class="src-meta">Google Cloud Security · 2025</div>
                   <div class="src-excerpt">"PROMPTFLUX — malware that consults a live AI model during attacks to rewrite its own code in real-time."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 93">93</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                     <span class="src-cite">[2]</span>
                   </div>
@@ -801,7 +823,6 @@
                   <div class="src-meta">Reuters / SCMP · Feb 2024</div>
                   <div class="src-excerpt">"Criminals used AI-generated deepfake video calls to impersonate a CFO, transferring USD $25.6 million."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 89">89</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                     <span class="src-cite">[3]</span>
                   </div>
@@ -815,7 +836,6 @@
                   <div class="src-meta">Cyber Security Agency · 2026</div>
                   <div class="src-excerpt">"Five priority actions: updated risk assessments, full asset visibility, accelerated patching, governed AI use, AI-powered defences."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 97">97</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                     <span class="src-cite">[4]</span>
                   </div>
@@ -834,7 +854,6 @@
                   <div class="src-meta">MDDI · Launched Nov 2023</div>
                   <div class="src-excerpt">"Sets out Singapore's approach to maximising opportunities from AI and building an AI-enabled economy."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 74">74</div>
                     <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
                   </div>
                 </div>
@@ -847,7 +866,6 @@
                   <div class="src-meta">CSA Singapore · Oct 2021</div>
                   <div class="src-excerpt">"Four pillars: resilient infrastructure, safer cyberspace, international cooperation, cyber ecosystem."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-mid" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 68">68</div>
                     <span class="badge badge-warning" style="font-size:0.65rem;">Moderate</span>
                   </div>
                 </div>
@@ -860,7 +878,6 @@
                   <div class="src-meta">MP Research · PQ360 Internal</div>
                   <div class="src-excerpt">"Filed 4 prior questions on digital infrastructure, AI governance, and fintech resilience."</div>
                   <div class="src-footer">
-                    <div class="score-ring score-high" style="width:30px;height:30px;font-size:0.65rem;" aria-label="Relevance 86">86</div>
                     <span class="badge badge-success" style="font-size:0.65rem;">Highly relevant</span>
                   </div>
                 </div>
@@ -929,17 +946,19 @@
     <div class="followups-section">
       <div class="followups-label">Suggested follow-ups</div>
       <div class="followups-grid">
+        <!--
         <button class="followup-chip" onclick="sendPrompt('Make it more concise')">
           <i class="bi bi-arrows-collapse" aria-hidden="true"></i> More concise
         </button>
-        <button class="followup-chip" onclick="sendPrompt('Strengthen the cybersecurity commitment')">
-          <i class="bi bi-check-circle" aria-hidden="true"></i> Firm commitment
-        </button>
         <button class="followup-chip" onclick="sendPrompt('Rewrite the opening paragraph')">
-          <i class="bi bi-pencil" aria-hidden="true"></i> Rewrite opener
+          <i class="bi bi-pencil" aria-hidden="true"></i> Rewrite
         </button>
-        <button class="followup-chip" onclick="sendPrompt('Add AI threat statistics')">
-          <i class="bi bi-bar-chart" aria-hidden="true"></i> Add data
+        -->
+        <button class="followup-chip" onclick="sendPrompt('Make it sound like Minister Josephine Teo')">
+          <i class="bi bi-person-fill" aria-hidden="true"></i> Minister Josephine
+        </button>
+        <button class="followup-chip" onclick="sendPrompt('Make it sound like SMS Tan Kiat How')">
+          <i class="bi bi-person-fill" aria-hidden="true"></i> SMS Tan Kiat How
         </button>
       </div>
     </div>
@@ -1062,7 +1081,7 @@ function exportDraft() {
   const text = editor.innerText || document.getElementById('aiDraft').innerText;
   const a = Object.assign(document.createElement('a'), {
     href: URL.createObjectURL(new Blob([text], { type: 'text/plain' })),
-    download: 'PQ360_Draft.txt'
+    download: 'PQ360_Draft.docx'
   });
   a.click();
 }
@@ -1093,7 +1112,7 @@ function exportDraft() {
   });
 })();
 
-updateWordCount();
+copyFromDraft();
 
 // ── Panel collapse ────────────────────────────────────
 function toggleInfoPanel() {
@@ -1103,9 +1122,51 @@ function toggleInfoPanel() {
   btn.setAttribute('aria-expanded', String(!collapsed));
 }
 
+// ── Info panel vertical resize ────────────────────────
+(function () {
+  const handle = document.getElementById('infoResizeHandle');
+  const panel  = document.querySelector('.info-panel');
+  if (!handle || !panel) return;
+
+  let dragging = false, startY = 0, startH = 0;
+
+  handle.addEventListener('mousedown', function (e) {
+    if (panel.classList.contains('collapsed')) return;
+    dragging = true;
+    startY = e.clientY;
+    startH = panel.offsetHeight;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    const delta = e.clientY - startY;
+    const newH  = Math.min(600, Math.max(100, startH + delta));
+    panel.style.height = newH + 'px';
+  });
+
+  document.addEventListener('mouseup', function () {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
+
 function toggleSourcesPanel() {
   const panel = document.querySelector('.sources-panel');
   const btn   = document.querySelector('.btn-src-collapse');
+  const collapsed = panel.classList.toggle('collapsed');
+  btn.setAttribute('aria-expanded', String(!collapsed));
+}
+
+function toggleEditorPanel() {
+  const panel = document.querySelector('.editor-wrap');
+  const btn   = document.querySelector('.btn-editor-collapse');
   const collapsed = panel.classList.toggle('collapsed');
   btn.setAttribute('aria-expanded', String(!collapsed));
 }
